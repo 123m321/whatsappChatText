@@ -9,9 +9,9 @@ def openlog(file):
 def modus():
     print ("we can ignore very small words in the analyses. Minimum length 4 would ignore \"meh\" \nAlso words being used \
 only once can be typo's or addresslines. Not interesting.\n") 
-    minwordlength=input("What is your minimum word length to check? : ")
-    minwordfrequency=input("How often do words need to be used to check? : ")
-    return (minwordlength,minwordfrequency)
+    MINWORDLENGTH=input("What is your minimum word length to check? : ")
+    MINWORDFREQUENCY=input("How often do words need to be used to check? : ")
+    return (MINWORDLENGTH,MINWORDFREQUENCY)
 
 def usernames(chat):
     person1=person2="0"
@@ -36,8 +36,8 @@ def checklines(person):
             text.append(mo.group(2).split())
 
     for item in text:
-        for woordje in item:
-            woord.append(woordje)    
+        for wrd in item:
+            woord.append(wrd)    
 
     for item in woord:    
         zoek = re.compile(r"([a-zA-Z]+)")
@@ -69,11 +69,11 @@ def voc(naam):
 
 chat=openlog("chat.txt")
 
-abc=modus()            
+answers=modus()            
 pers1=usernames(chat)[0]
 pers2=usernames(chat)[1]
-minwordlength=abc[0]
-minwordfrequency=abc[1]
+MINWORDLENGTH=answers[0]
+MINWORDFREQUENCY=answers[1]
 
 person1=checklines(pers1)
 person2=checklines(pers2)
@@ -85,12 +85,12 @@ p2dict=unique_words(person2)[1]
 
 voca_person1=voc(person1_unique)
 voca_person2=voc(person2_unique)
-voca_person2=[item for item in voca_person2 if len(item)>=int(minwordlength)]
-voca_person1=[item for item in voca_person1 if len(item)>=int(minwordlength)]
+voca_person2=[item for item in voca_person2 if len(item)>=int(MINWORDLENGTH)]
+voca_person1=[item for item in voca_person1 if len(item)>=int(MINWORDLENGTH)]
 
 for p in [person2_unique,person1_unique]:
-    p=[item for item in p if item[1]>=int(minwordfrequency)]
-    p=[item for item in p if len(item[0])>=int(minwordlength)]
+    p=[item for item in p if item[1]>=int(MINWORDFREQUENCY)]
+    p=[item for item in p if len(item[0])>=int(MINWORDLENGTH)]
 
    
 print (pers2 + " used " + str(len(voca_person2)) + " different words. Total typed " +str(len(person2)) + " words\n")
