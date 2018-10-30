@@ -1,8 +1,10 @@
 import re
-f = open( "chat.txt", "r",encoding='utf-8')
-chat=[]
-for line in f:
-    chat.append(line.strip())
+def openlog(file):
+    f = open( file, "r",encoding='utf-8')
+    chat=[]
+    for line in f:
+        chat.append(line.strip())
+    return chat
 
 def modus():
     print ("we can ignore very small words in the analyses. Minimum length 4 would ignore \"meh\" \nAlso words being used \
@@ -22,11 +24,6 @@ def usernames(chat):
             person2=mo.group(3)
     return (person1,person2)
 
-abc=modus()            
-pers1=usernames(chat)[0]
-pers2=usernames(chat)[1]
-minwordlength=abc[0]
-minwordfrequency=abc[1]
 
 def checklines(person):
     text=[]
@@ -70,6 +67,14 @@ def voc(naam):
         voca.append(i[0])
     return voca
 
+chat=openlog("chat.txt")
+
+abc=modus()            
+pers1=usernames(chat)[0]
+pers2=usernames(chat)[1]
+minwordlength=abc[0]
+minwordfrequency=abc[1]
+
 person1=checklines(pers1)
 person2=checklines(pers2)
 person1_unique=unique_words(person1)[0]
@@ -109,6 +114,5 @@ for i in range(len(voca_person1)):
         ii+=1
         if ii>24:
             break
-
 
 
