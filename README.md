@@ -1,5 +1,5 @@
 # whatsappChatText
-Checking whether you (or the other person) uses words that you don't use in a converstation.
+Checking whether you (or the other person) uses unique words that you don't use in a converstation.
 
 Use:
 
