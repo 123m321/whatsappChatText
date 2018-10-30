@@ -1,0 +1,114 @@
+import re
+f = open( "chat.txt", "r",encoding='utf-8')
+chat=[]
+for line in f:
+    chat.append(line.strip())
+
+def modus():
+    print ("we can ignore very small words in the analyses. Minimum length 4 would ignore \"meh\" \nAlso words being used \
+only once can be typo's or addresslines. Not interesting.\n") 
+    minwordlength=input("What is your minimum word length to check? : ")
+    minwordfrequency=input("How often do words need to be used to check? : ")
+    return (minwordlength,minwordfrequency)
+
+def usernames(chat):
+    person1=person2="0"
+    for line in range(100):
+        zoek = re.compile(r"\ (.+])(\s)(.+:)")
+        mo=zoek.search(chat[line])
+        if person1=="0":
+            person1=mo.group(3)
+        elif person1!=mo.group(3):
+            person2=mo.group(3)
+    return (person1,person2)
+
+abc=modus()            
+pers1=usernames(chat)[0]
+pers2=usernames(chat)[1]
+minwordlength=abc[0]
+minwordfrequency=abc[1]
+
+def checklines(person):
+    text=[]
+    woord=[]
+    woordclean=[]
+    for item in chat:
+        zoek = re.compile(r"\ ("+ person +")(.+)")
+        mo=zoek.search(item)
+        if mo:
+            text.append(mo.group(2).split())
+
+    for item in text:
+        for woordje in item:
+            woord.append(woordje)    
+
+    for item in woord:    
+        zoek = re.compile(r"([a-zA-Z]+)")
+        mol=zoek.search(item)
+        if mol:
+            woordclean.append(mol.group(1))
+    woordclean=[item for item in woordclean if len(item)>1]
+    return woordclean
+
+def unique_words(words):
+    word_dict={}
+    unique=[]
+    for i in words:
+        if i.lower() in word_dict:
+            word_dict[i.lower()]+=1
+        else:
+            word_dict[i.lower()]=1
+
+    for x in word_dict.items():
+        unique.append(x,)
+    unique.sort(key=lambda x: x[1], reverse=True)
+    return unique, word_dict
+
+def voc(naam):
+    voca=[]
+    for i in naam:
+        voca.append(i[0])
+    return voca
+
+person1=checklines(pers1)
+person2=checklines(pers2)
+person1_unique=unique_words(person1)[0]
+person2_unique=unique_words(person2)[0]
+p1dict=unique_words(person1)[1]
+p2dict=unique_words(person2)[1]
+
+
+voca_person1=voc(person1_unique)
+voca_person2=voc(person2_unique)
+voca_person2=[item for item in voca_person2 if len(item)>=int(minwordlength)]
+voca_person1=[item for item in voca_person1 if len(item)>=int(minwordlength)]
+
+for p in [person2_unique,person1_unique]:
+    p=[item for item in p if item[1]>=int(minwordfrequency)]
+    p=[item for item in p if len(item[0])>=int(minwordlength)]
+
+   
+print (pers2 + " used " + str(len(voca_person2)) + " different words. Total typed " +str(len(person2)) + " words\n")
+print (pers1 + " used " + str(len(voca_person1)) + " different words. Total typed " +str(len(person1)) + " words")
+
+print ("-"*30)
+print ("Top 25 own words from " + pers2)
+ii=0
+for i in range(len(voca_person2)):
+   if voca_person2[i] not in voca_person1:
+        print (voca_person2[i] + " ("+str(p2dict[voca_person2[i]])+")")
+        ii+=1
+        if ii>24:
+            break
+
+print ("Top 25 own words from " + pers1)
+ii=0
+for i in range(len(voca_person1)):
+   if voca_person1[i] not in voca_person2:
+        print (voca_person1[i] + " ("+str(p1dict[voca_person1[i]])+")")
+        ii+=1
+        if ii>24:
+            break
+
+
+
