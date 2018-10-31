@@ -1,9 +1,9 @@
 import re
 def openlog(file):
-    f = open( file, "r",encoding='utf-8')
     chat=[]
-    for line in f:
-        chat.append(line.strip())
+    with open( file, "r",encoding='utf-8') as f:   
+        for line in f:
+            chat.append(line.strip())
     return chat
 
 def modus():
@@ -11,7 +11,7 @@ def modus():
 only once can be typo's or addresslines. Not interesting.\n") 
     MINWORDLENGTH=input("What is your minimum word length to check? : ")
     MINWORDFREQUENCY=input("How often do words need to be used to check? : ")
-    return (MINWORDLENGTH,MINWORDFREQUENCY)
+    return MINWORDLENGTH,MINWORDFREQUENCY
 
 def usernames(chat):
     p1_all_words=p2_all_words="0"
@@ -23,7 +23,6 @@ def usernames(chat):
         elif p1_all_words!=mo.group(3):
             p2_all_words=mo.group(3)
     return (p1_all_words,p2_all_words)
-
 
 def checklines(person):
     text=[]
@@ -61,57 +60,38 @@ def unique_words(words):
     unique.sort(key=lambda x: x[1], reverse=True)
     return unique, word_dict
 
-def voc(naam):
-    voca=[]
-    for i in naam:
-        voca.append(i[0])
-    return voca
-
 chat=openlog("chat.txt")
-answers=modus()
-MINWORDLENGTH=answers[0]
-MINWORDFREQUENCY=answers[1]
+MINWORDLENGTH, MINWORDFREQUENCY = modus()
 
-p1_username=usernames(chat)[0]
-p1_all_words=checklines(p1_username)
-p1_all_words_unique=unique_words(p1_all_words)[0]
-p1dict=unique_words(p1_all_words)[1]
-vocabulary_p1=voc(p1_all_words_unique)
-vocabulary_p1=[item for item in vocabulary_p1 if len(item)>=int(MINWORDLENGTH)]
+all_words_unique=[unique_words(checklines(usernames(chat)[0]))[0],unique_words(checklines(usernames(chat)[1]))[0]]
+p1dict=unique_words(checklines(usernames(chat)[0]))[1]
+p2dict=unique_words(checklines(usernames(chat)[1]))[1]
+pdict=[p1dict,p2dict]
 
-p2_username=usernames(chat)[1]
-p2_all_words=checklines(p2_username)
-p2_all_words_unique=unique_words(p2_all_words)[0]
-p2dict=unique_words(p2_all_words)[1]
-vocabulary_p2=voc(p2_all_words_unique)
-vocabulary_p2=[item for item in vocabulary_p2 if len(item)>=int(MINWORDLENGTH)]
+for y in [0,1]:
+    all_words_unique[y]=[item for item in all_words_unique[y] if len(item[0])>=int(MINWORDLENGTH)]
+    all_words_unique[y]=[item for item in all_words_unique[y] if item[1]>=int(MINWORDFREQUENCY)]
 
+def summary():  
+    for x in [0,1]:
+        print (f"{usernames(chat)[x]} used {str(len(all_words_unique[x]))} different words. \
+Total typed {str(len(checklines(usernames(chat)[x])))} words\n")
 
-for p in [p2_all_words_unique,p1_all_words_unique]:
-    p=[item for item in p if item[1]>=int(MINWORDFREQUENCY)]
-    p=[item for item in p if len(item[0])>=int(MINWORDLENGTH)]
+def print_top25(username,words,p1dict,p2dict):
+    print ("-"*30)
+    print ("Top 25 own words from " + username)
+    ii=0
+    for i in words:
+       if i[0] not in p1dict.keys():
+            print (i[0] + " ("+str(p2dict[i[0]])+")")
+            ii+=1
+            if ii>24:
+                break
 
-   
-print (p2_username + " used " + str(len(vocabulary_p2)) + " different words. Total typed " +str(len(p2_all_words)) + " words\n")
-print (p1_username + " used " + str(len(vocabulary_p1)) + " different words. Total typed " +str(len(p1_all_words)) + " words")
+summary()
+for x in [(usernames(chat)[1],all_words_unique[1],p1dict,p2dict),(usernames(chat)[0],all_words_unique[0],p2dict,p1dict)]:
+    print_top25(x[0],x[1],x[2],x[3])
 
-print ("-"*30)
-print ("Top 25 own words from " + p2_username)
-ii=0
-for i in range(len(vocabulary_p2)):
-   if vocabulary_p2[i] not in vocabulary_p1:
-        print (vocabulary_p2[i] + " ("+str(p2dict[vocabulary_p2[i]])+")")
-        ii+=1
-        if ii>24:
-            break
-
-print ("Top 25 own words from " + p1_username)
-ii=0
-for i in range(len(vocabulary_p1)):
-   if vocabulary_p1[i] not in vocabulary_p2:
-        print (vocabulary_p1[i] + " ("+str(p1dict[vocabulary_p1[i]])+")")
-        ii+=1
-        if ii>24:
-            break
+    
 
 
