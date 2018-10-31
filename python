@@ -14,15 +14,15 @@ only once can be typo's or addresslines. Not interesting.\n")
     return (MINWORDLENGTH,MINWORDFREQUENCY)
 
 def usernames(chat):
-    person1=person2="0"
+    p1_all_words=p2_all_words="0"
     for line in range(100):
         zoek = re.compile(r"\ (.+])(\s)(.+:)")
         mo=zoek.search(chat[line])
-        if person1=="0":
-            person1=mo.group(3)
-        elif person1!=mo.group(3):
-            person2=mo.group(3)
-    return (person1,person2)
+        if p1_all_words=="0":
+            p1_all_words=mo.group(3)
+        elif p1_all_words!=mo.group(3):
+            p2_all_words=mo.group(3)
+    return (p1_all_words,p2_all_words)
 
 
 def checklines(person):
@@ -68,49 +68,48 @@ def voc(naam):
     return voca
 
 chat=openlog("chat.txt")
-
-answers=modus()            
-pers1=usernames(chat)[0]
-pers2=usernames(chat)[1]
+answers=modus()
 MINWORDLENGTH=answers[0]
 MINWORDFREQUENCY=answers[1]
 
-person1=checklines(pers1)
-person2=checklines(pers2)
-person1_unique=unique_words(person1)[0]
-person2_unique=unique_words(person2)[0]
-p1dict=unique_words(person1)[1]
-p2dict=unique_words(person2)[1]
+p1_username=usernames(chat)[0]
+p1_all_words=checklines(p1_username)
+p1_all_words_unique=unique_words(p1_all_words)[0]
+p1dict=unique_words(p1_all_words)[1]
+vocabulary_p1=voc(p1_all_words_unique)
+vocabulary_p1=[item for item in vocabulary_p1 if len(item)>=int(MINWORDLENGTH)]
+
+p2_username=usernames(chat)[1]
+p2_all_words=checklines(p2_username)
+p2_all_words_unique=unique_words(p2_all_words)[0]
+p2dict=unique_words(p2_all_words)[1]
+vocabulary_p2=voc(p2_all_words_unique)
+vocabulary_p2=[item for item in vocabulary_p2 if len(item)>=int(MINWORDLENGTH)]
 
 
-voca_person1=voc(person1_unique)
-voca_person2=voc(person2_unique)
-voca_person2=[item for item in voca_person2 if len(item)>=int(MINWORDLENGTH)]
-voca_person1=[item for item in voca_person1 if len(item)>=int(MINWORDLENGTH)]
-
-for p in [person2_unique,person1_unique]:
+for p in [p2_all_words_unique,p1_all_words_unique]:
     p=[item for item in p if item[1]>=int(MINWORDFREQUENCY)]
     p=[item for item in p if len(item[0])>=int(MINWORDLENGTH)]
 
    
-print (pers2 + " used " + str(len(voca_person2)) + " different words. Total typed " +str(len(person2)) + " words\n")
-print (pers1 + " used " + str(len(voca_person1)) + " different words. Total typed " +str(len(person1)) + " words")
+print (p2_username + " used " + str(len(vocabulary_p2)) + " different words. Total typed " +str(len(p2_all_words)) + " words\n")
+print (p1_username + " used " + str(len(vocabulary_p1)) + " different words. Total typed " +str(len(p1_all_words)) + " words")
 
 print ("-"*30)
-print ("Top 25 own words from " + pers2)
+print ("Top 25 own words from " + p2_username)
 ii=0
-for i in range(len(voca_person2)):
-   if voca_person2[i] not in voca_person1:
-        print (voca_person2[i] + " ("+str(p2dict[voca_person2[i]])+")")
+for i in range(len(vocabulary_p2)):
+   if vocabulary_p2[i] not in vocabulary_p1:
+        print (vocabulary_p2[i] + " ("+str(p2dict[vocabulary_p2[i]])+")")
         ii+=1
         if ii>24:
             break
 
-print ("Top 25 own words from " + pers1)
+print ("Top 25 own words from " + p1_username)
 ii=0
-for i in range(len(voca_person1)):
-   if voca_person1[i] not in voca_person2:
-        print (voca_person1[i] + " ("+str(p1dict[voca_person1[i]])+")")
+for i in range(len(vocabulary_p1)):
+   if vocabulary_p1[i] not in vocabulary_p2:
+        print (vocabulary_p1[i] + " ("+str(p1dict[vocabulary_p1[i]])+")")
         ii+=1
         if ii>24:
             break
